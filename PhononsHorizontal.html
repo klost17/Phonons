@@ -1,0 +1,309 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Phonons simulator: Horizontal Version</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2017-05-01"><meta name="DC.source" content="PhononsFinal.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Phonons simulator: Horizontal Version</h1><pre class="codeinput"><span class="comment">% We will be using silicon atoms for our chain (we take the distance between</span>
+<span class="comment">% the nearest neighbour atoms in a silicon crystal as our lattice parameter a)</span>
+
+m=28*1.660538921*10^(-27); <span class="comment">%mass of an atom (kg)</span>
+K=59.7939; <span class="comment">%Hook's constant (kg/s^2)</span>
+a=5.43*10^-10*sqrt(3)/4; <span class="comment">%distance between atoms (m)</span>
+N=50; <span class="comment">%Number of atoms in the chain</span>
+T=295; <span class="comment">%Temperature (K)</span>
+P=[19:N-18]; <span class="comment">%Normal modes we want to combine to make the representation (all of them in this case)</span>
+Kb=1.38064852*10^(-23); <span class="comment">%Boltzmann constant</span>
+hbar=1.054571800*10^(-34); <span class="comment">%Dirac constant</span>
+B=1/(Kb*T);
+
+<span class="comment">%Finding the different possible values of k for the conditions entered.</span>
+ii=mod(N,2); <span class="comment">%0 if the number of atoms is even, 1 if it is odd</span>
+<span class="keyword">if</span> ii == 1
+    n=[-N/2+1/2:N/2-1/2];
+<span class="keyword">else</span>
+    n=[-N/2:N/2-1];
+<span class="keyword">end</span>
+<span class="comment">% By this we ensure that n is a vector of N equally spaced integers for</span>
+<span class="comment">% which  every k will be between -pi/a and pi/a (so that we work in the 1st Brillouin Zone)</span>
+k=(2*pi*n)/(N*a);
+
+<span class="comment">%Computing frequency for each wavenumber (we plug k in the dispersion relation)</span>
+w=2*sqrt(K/m)*abs(sin(k*a/2));
+
+<span class="comment">%Finding corresponding energies</span>
+E=hbar.*w.*(1./(exp(B*hbar*w)-1)+1/2);
+[o,u]=find(n==0); <span class="comment">%Finding the w=0 mode</span>
+E(u)=Kb*T; <span class="comment">%Using the limit when w-&gt;0</span>
+
+<span class="comment">%Finding amplitudes</span>
+A=sqrt(2*E/K);
+
+<span class="comment">% Equilibrium positions:</span>
+x=[1:N]*a; <span class="comment">%For each atom</span>
+xfine=[1:0.01:N]*a; <span class="comment">%For a fine grid, to represent the wave that the atoms follow.</span>
+
+<span class="comment">% Now we define a the fine grid where we will be evaluating the wave.</span>
+<span class="keyword">if</span> ii == 1
+    nfine=[-N/2+1/2:0.01:N/2-1/2];
+<span class="keyword">else</span>
+    nfine=[-N/2:0.01:N/2-1];
+<span class="keyword">end</span>
+Nfine=length(nfine);
+
+<span class="comment">% We obtain the "photos" to make the GIF</span>
+figure;
+timestart=1200;
+timelapse=1280;
+
+<span class="keyword">for</span> t = timestart:timelapse
+
+    dx=[];
+    tt=t*(10^(-14)); <span class="comment">%Small timelapse as we have very high frequencies</span>
+    <span class="comment">% Now we sum the position variation of an atom for each normal mode (we do this for every atom and store the distances in a vector)</span>
+    dx= sum((A(P)'*ones(1,N)).*cos((w(P)'*ones(1,N)).*tt-(k(P)'*n).*a),1);
+    <span class="comment">% Then we do the same, but this time applied to the fine grid, to</span>
+    <span class="comment">% represent the wave</span>
+    dxwave= sum((A(P)'*ones(1,Nfine)).*cos((w(P)'*ones(1,Nfine)).*tt-(k(P)'*nfine).*a),1);
+    xsol=x+dx; <span class="comment">% Adding the position variation to the equilibrium position of each atom we get their actual position</span>
+    y=zeros(length(xsol),1); <span class="comment">%To get all the atoms in the x axis(y=0)</span>
+
+    <span class="comment">%If N is greater than 6 making a plot of all the atoms would not be the</span>
+    <span class="comment">%best call. Instead we can divide the representation into two cases:</span>
+    <span class="keyword">if</span> N &gt; 6 <span class="comment">%case 1</span>
+        <span class="keyword">if</span> ii == 1 <span class="comment">% Again, differentiating betwwen even or odd number of atoms</span>
+            e=(N+1)/2;
+        <span class="keyword">else</span>
+            e=N/2;
+        <span class="keyword">end</span>
+
+        <span class="comment">%We will plot only 5 atoms, with their equilibrium positions and</span>
+        <span class="comment">%the wave.</span>
+        plot(x(e-2:e+2),y(e-2:e+2),<span class="string">'o'</span>,<span class="string">'Color'</span>,[1 0 0],<span class="string">'MarkerSize'</span>,1,<span class="string">'LineWidth'</span>,1); <span class="comment">%Equilibrium position</span>
+        <span class="comment">%title(['movimiento cadena monoat&oacute;mica 1D, modos normales: 1:' num2str( N ) ])</span>
+        hold <span class="string">on</span>
+        axis([x(e-3) x(e+3) -0.4*10^(-9) 0.4*10^(-9)]);
+        plot(xsol(e-2:e+2),y(e-2:e+2),<span class="string">'o'</span>,<span class="string">'Color'</span>,[0 0 0],<span class="string">'MarkerSize'</span>,10,<span class="string">'LineWidth'</span>,1); <span class="comment">%Atoms</span>
+        hold <span class="string">on</span>
+        plot(xfine,dxwave) <span class="comment">%Wave</span>
+
+    <span class="keyword">else</span> <span class="comment">%case 2</span>
+        plot(x,y,<span class="string">'o'</span>,<span class="string">'Color'</span>,[1 0 0],<span class="string">'MarkerSize'</span>,1,<span class="string">'LineWidth'</span>,2);
+        <span class="comment">%title(['movimiento cadena monoat&oacute;mica 1D, modos normales: 1:' num2str( N ) ])</span>
+        hold <span class="string">on</span>
+        axis([0 x(N)+a -0.4*10^(-9) 0.4*10^(-9)]);
+        plot(xsol,y,<span class="string">'o'</span>,<span class="string">'Color'</span>,[0 0 0],<span class="string">'MarkerSize'</span>,10,<span class="string">'LineWidth'</span>,1);
+        hold <span class="string">on</span>
+        plot(xfine,dxwave)
+    <span class="keyword">end</span>
+    <span class="comment">%For each plot we take out what is called a frame, this frame will be</span>
+    <span class="comment">%transformed into an image with the comand frame2im and saved in thee</span>
+    <span class="comment">%im{} matrix</span>
+    frame= getframe(1);
+    im{t} = frame2im(frame);
+    hold <span class="string">off</span>
+
+<span class="keyword">end</span>
+
+<span class="comment">% Creation of GIF</span>
+
+filename = <span class="string">'Monoatomic_chain.gif'</span>;
+
+<span class="keyword">for</span> i = timestart:timelapse
+    [Ag,map] = rgb2ind(im{i},256); <span class="comment">%From each image we find its corresponding</span>
+    <span class="comment">%indexed matrix and color map.The indexed matrix has a value in each</span>
+    <span class="comment">%cell that corresponds to a specific color (combination of red, blue,</span>
+    <span class="comment">%green) in the color map.</span>
+    <span class="keyword">if</span> i == timestart
+        imwrite(Ag,map,filename,<span class="string">'gif'</span>,<span class="string">'LoopCount'</span>,Inf,<span class="string">'DelayTime'</span>,.1);
+    <span class="keyword">else</span>
+        imwrite(Ag,map,filename,<span class="string">'gif'</span>,<span class="string">'WriteMode'</span>,<span class="string">'append'</span>,<span class="string">'DelayTime'</span>,.1);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="Monoatomic_chain1.gif" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Phonons simulator: Horizontal Version
+
+% We will be using silicon atoms for our chain (we take the distance between
+% the nearest neighbour atoms in a silicon crystal as our lattice parameter a)
+
+m=28*1.660538921*10^(-27); %mass of an atom (kg)
+K=59.7939; %Hook's constant (kg/s^2)
+a=5.43*10^-10*sqrt(3)/4; %distance between atoms (m)
+N=50; %Number of atoms in the chain
+T=295; %Temperature (K)
+P=[19:N-18]; %Normal modes we want to combine to make the representation (all of them in this case)
+Kb=1.38064852*10^(-23); %Boltzmann constant
+hbar=1.054571800*10^(-34); %Dirac constant
+B=1/(Kb*T);
+
+%Finding the different possible values of k for the conditions entered.
+ii=mod(N,2); %0 if the number of atoms is even, 1 if it is odd
+if ii == 1
+    n=[-N/2+1/2:N/2-1/2];
+else
+    n=[-N/2:N/2-1];
+end
+% By this we ensure that n is a vector of N equally spaced integers for
+% which  every k will be between -pi/a and pi/a (so that we work in the 1st Brillouin Zone)
+k=(2*pi*n)/(N*a);
+
+%Computing frequency for each wavenumber (we plug k in the dispersion relation)
+w=2*sqrt(K/m)*abs(sin(k*a/2));
+
+%Finding corresponding energies
+E=hbar.*w.*(1./(exp(B*hbar*w)-1)+1/2);
+[o,u]=find(n==0); %Finding the w=0 mode
+E(u)=Kb*T; %Using the limit when w->0
+
+%Finding amplitudes
+A=sqrt(2*E/K);
+
+% Equilibrium positions:
+x=[1:N]*a; %For each atom
+xfine=[1:0.01:N]*a; %For a fine grid, to represent the wave that the atoms follow.
+
+% Now we define a the fine grid where we will be evaluating the wave.
+if ii == 1
+    nfine=[-N/2+1/2:0.01:N/2-1/2];
+else
+    nfine=[-N/2:0.01:N/2-1];
+end
+Nfine=length(nfine);
+
+% We obtain the "photos" to make the GIF 
+figure;
+timestart=1200;
+timelapse=1280;
+
+for t = timestart:timelapse
+    
+    dx=[];
+    tt=t*(10^(-14)); %Small timelapse as we have very high frequencies
+    % Now we sum the position variation of an atom for each normal mode (we do this for every atom and store the distances in a vector)
+    dx= sum((A(P)'*ones(1,N)).*cos((w(P)'*ones(1,N)).*tt-(k(P)'*n).*a),1);
+    % Then we do the same, but this time applied to the fine grid, to
+    % represent the wave
+    dxwave= sum((A(P)'*ones(1,Nfine)).*cos((w(P)'*ones(1,Nfine)).*tt-(k(P)'*nfine).*a),1);
+    xsol=x+dx; % Adding the position variation to the equilibrium position of each atom we get their actual position
+    y=zeros(length(xsol),1); %To get all the atoms in the x axis(y=0)
+    
+    %If N is greater than 6 making a plot of all the atoms would not be the
+    %best call. Instead we can divide the representation into two cases:
+    if N > 6 %case 1
+        if ii == 1 % Again, differentiating betwwen even or odd number of atoms
+            e=(N+1)/2;
+        else
+            e=N/2;
+        end
+        
+        %We will plot only 5 atoms, with their equilibrium positions and
+        %the wave.
+        plot(x(e-2:e+2),y(e-2:e+2),'o','Color',[1 0 0],'MarkerSize',1,'LineWidth',1); %Equilibrium position
+        %title(['movimiento cadena monoatómica 1D, modos normales: 1:' num2str( N ) ]) 
+        hold on
+        axis([x(e-3) x(e+3) -0.4*10^(-9) 0.4*10^(-9)]);
+        plot(xsol(e-2:e+2),y(e-2:e+2),'o','Color',[0 0 0],'MarkerSize',10,'LineWidth',1); %Atoms
+        hold on
+        plot(xfine,dxwave) %Wave
+        
+    else %case 2
+        plot(x,y,'o','Color',[1 0 0],'MarkerSize',1,'LineWidth',2);
+        %title(['movimiento cadena monoatómica 1D, modos normales: 1:' num2str( N ) ])
+        hold on
+        axis([0 x(N)+a -0.4*10^(-9) 0.4*10^(-9)]);
+        plot(xsol,y,'o','Color',[0 0 0],'MarkerSize',10,'LineWidth',1);
+        hold on
+        plot(xfine,dxwave)
+    end
+    %For each plot we take out what is called a frame, this frame will be
+    %transformed into an image with the comand frame2im and saved in thee
+    %im{} matrix
+    frame= getframe(1);
+    im{t} = frame2im(frame);
+    hold off
+    
+end
+
+% Creation of GIF
+
+filename = 'Monoatomic_chain.gif';
+
+for i = timestart:timelapse
+    [Ag,map] = rgb2ind(im{i},256); %From each image we find its corresponding 
+    %indexed matrix and color map.The indexed matrix has a value in each
+    %cell that corresponds to a specific color (combination of red, blue,
+    %green) in the color map.
+    if i == timestart
+        imwrite(Ag,map,filename,'gif','LoopCount',Inf,'DelayTime',.1);
+    else
+        imwrite(Ag,map,filename,'gif','WriteMode','append','DelayTime',.1);
+    end
+end
+
+
+
+##### SOURCE END #####
+--></body></html>

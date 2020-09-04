@@ -1,0 +1,307 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Phonons simulator: Comparison Version</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2017-05-01"><meta name="DC.source" content="PhononsComparativa.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Phonons simulator: Comparation Version</h1><pre class="codeinput"><span class="comment">%There are only some minor differences between this code and the one</span>
+<span class="comment">%horizontal one. So, to keep it simple, we got rid of all the comments in</span>
+<span class="comment">%this code except for the ones that explain those differences</span>
+
+a=5.43*10^-10*sqrt(3)/4;
+Kb=1.38064852*10^(-23);
+hbar=1.054571800*10^(-34);
+N=50;
+P=[1:N];
+
+<span class="comment">%Inputs for the first case (Blue)</span>
+m1=28*1.660538921*10^(-27);
+K1=59.7939;
+T1=295;
+B1=1/(Kb*T1);
+
+<span class="comment">%Inputs for the second case (Red)</span>
+m2=m1;
+K2=K1;
+T2=595;
+B2=1/(Kb*T2);
+
+ii=mod(N,2);
+<span class="keyword">if</span> ii == 1
+    n=[-N/2+1/2:N/2-1/2];
+<span class="keyword">else</span>
+    n=[-N/2:N/2-1];
+<span class="keyword">end</span>
+
+k=(2*pi*n)/(N*a);
+
+w1=2*sqrt(K1/m1)*abs(sin(k*a/2));
+
+E1=hbar.*w1.*(1./(exp(B1*hbar*w1)-1)+1/2);
+[o,u]=find(n==0);
+E1(u)=Kb*T1;
+
+A1=sqrt(2*E1/K1);
+
+<span class="comment">%We now compute all the variables needed for the second case</span>
+w2=2*sqrt(K2/m2)*abs(sin(k*a/2));
+E2=hbar.*w2.*(1./(exp(B2*hbar*w2)-1)+1/2);
+E2(u)=Kb*T2;
+A2=sqrt(2*E2/K2);
+
+x=[1:N]*a;
+xfine=[1:0.01:N]*a;
+
+<span class="keyword">if</span> ii == 1
+    nfine=[-N/2+1/2:0.01:N/2-1/2];
+<span class="keyword">else</span>
+    nfine=[-N/2:0.01:N/2-1];
+<span class="keyword">end</span>
+Nfine=length(nfine);
+
+
+figure;
+timestart=1200;
+timelapse=1280;
+
+<span class="keyword">for</span> t = timestart:timelapse
+
+    dx1=[];
+    dx2=[];
+    tt=t*(10^(-14));
+    dx1= sum((A1(P)'*ones(1,N)).*cos((w1(P)'*ones(1,N)).*tt-(k(P)'*n).*a),1); <span class="comment">%First case's position variation</span>
+    dx2= sum((A2(P)'*ones(1,N)).*cos((w2(P)'*ones(1,N)).*tt-(k(P)'*n).*a),1); <span class="comment">%Second case's position variation</span>
+    dxwave1= sum((A1(P)'*ones(1,Nfine)).*cos((w1(P)'*ones(1,Nfine)).*tt-(k(P)'*nfine).*a),1); <span class="comment">%First case's position variation in fine grid</span>
+    dxwave2= sum((A2(P)'*ones(1,Nfine)).*cos((w2(P)'*ones(1,Nfine)).*tt-(k(P)'*nfine).*a),1); <span class="comment">%Second case's position variation in fine grid</span>
+    xsol1=x+dx1; <span class="comment">%First case's position</span>
+    xsol2=x+dx2; <span class="comment">%Second case's position</span>
+    y=zeros(length(xsol1),1);
+
+    <span class="keyword">if</span> N &gt; 6
+        <span class="keyword">if</span> ii == 1
+            e=(N+1)/2;
+        <span class="keyword">else</span>
+            e=N/2;
+        <span class="keyword">end</span>
+
+        plot(x(e-2:e+2),y(e-2:e+2),<span class="string">'o'</span>,<span class="string">'Color'</span>,[0 0 0],<span class="string">'MarkerSize'</span>,1,<span class="string">'LineWidth'</span>,1); <span class="comment">%Equilibrium position</span>
+        hold <span class="string">on</span>
+        axis([x(e-3) x(e+3) -0.4*10^(-9) 0.4*10^(-9)]);
+        plot(xsol1(e-2:e+2),y(e-2:e+2),<span class="string">'o'</span>,<span class="string">'Color'</span>,[0 0 1],<span class="string">'MarkerSize'</span>,10,<span class="string">'LineWidth'</span>,1); <span class="comment">%First case's atoms</span>
+        plot(xsol2(e-2:e+2),y(e-2:e+2),<span class="string">'o'</span>,<span class="string">'Color'</span>,[1 0 0],<span class="string">'MarkerSize'</span>,10,<span class="string">'LineWidth'</span>,1); <span class="comment">%Second case's Atoms</span>
+        hold <span class="string">on</span>
+        plot(xfine,dxwave1,<span class="string">'b'</span>) <span class="comment">%First case's wave</span>
+        plot(xfine,dxwave2,<span class="string">'r'</span>) <span class="comment">%Second case's wave</span>
+
+    <span class="keyword">else</span> <span class="comment">%case 2</span>
+        plot(x,y,<span class="string">'o'</span>,<span class="string">'Color'</span>,[0 0 0],<span class="string">'MarkerSize'</span>,1,<span class="string">'LineWidth'</span>,2);
+        hold <span class="string">on</span>
+        axis([0 x(N)+a -0.4*10^(-9) 0.4*10^(-9)]);
+        plot(xsol1,y,<span class="string">'o'</span>,<span class="string">'Color'</span>,[0 0 1],<span class="string">'MarkerSize'</span>,10,<span class="string">'LineWidth'</span>,1);
+        plot(xsol2,y,<span class="string">'o'</span>,<span class="string">'Color'</span>,[1 0 0],<span class="string">'MarkerSize'</span>,10,<span class="string">'LineWidth'</span>,1);
+        hold <span class="string">on</span>
+        plot(xfine,dxwave1,<span class="string">'b'</span>)
+        plot(xfine,dxwave2,<span class="string">'r'</span>)
+    <span class="keyword">end</span>
+    frame= getframe(1);
+    im{t} = frame2im(frame);
+    hold <span class="string">off</span>
+
+<span class="keyword">end</span>
+
+filename = <span class="string">'Monoatomic_chain_comparation.gif'</span>;
+
+<span class="keyword">for</span> i = timestart:timelapse
+    [Ag,map] = rgb2ind(im{i},256);
+    <span class="keyword">if</span> i == timestart
+        imwrite(Ag,map,filename,<span class="string">'gif'</span>,<span class="string">'LoopCount'</span>,Inf,<span class="string">'DelayTime'</span>,.1);
+    <span class="keyword">else</span>
+        imwrite(Ag,map,filename,<span class="string">'gif'</span>,<span class="string">'WriteMode'</span>,<span class="string">'append'</span>,<span class="string">'DelayTime'</span>,.1);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="Monoatomic_chain_comparation1.gif" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Phonons simulator: Comparison Version
+
+%There are only some minor differences between this code and the one
+%horizontal one. So, to keep it simple, we got rid of all the comments in
+%this code except for the ones that explain those differences
+
+a=5.43*10^-10*sqrt(3)/4;
+Kb=1.38064852*10^(-23);
+hbar=1.054571800*10^(-34);
+N=50;
+P=[1:N];
+
+%Inputs for the first case (Blue)
+m1=28*1.660538921*10^(-27);
+K1=59.7939;
+T1=295;
+B1=1/(Kb*T1);
+
+%Inputs for the second case (Red)
+m2=m1;
+K2=K1;
+T2=595;
+B2=1/(Kb*T2);
+
+ii=mod(N,2);
+if ii == 1
+    n=[-N/2+1/2:N/2-1/2];
+else
+    n=[-N/2:N/2-1];
+end
+
+k=(2*pi*n)/(N*a);
+
+w1=2*sqrt(K1/m1)*abs(sin(k*a/2));
+
+E1=hbar.*w1.*(1./(exp(B1*hbar*w1)-1)+1/2);
+[o,u]=find(n==0);
+E1(u)=Kb*T1;
+
+A1=sqrt(2*E1/K1);
+
+%We now compute all the variables needed for the second case
+w2=2*sqrt(K2/m2)*abs(sin(k*a/2));
+E2=hbar.*w2.*(1./(exp(B2*hbar*w2)-1)+1/2);
+E2(u)=Kb*T2;
+A2=sqrt(2*E2/K2);
+
+x=[1:N]*a;
+xfine=[1:0.01:N]*a;
+
+if ii == 1
+    nfine=[-N/2+1/2:0.01:N/2-1/2];
+else
+    nfine=[-N/2:0.01:N/2-1];
+end
+Nfine=length(nfine);
+
+
+figure;
+timestart=1200;
+timelapse=1280;
+
+for t = timestart:timelapse
+    
+    dx1=[];
+    dx2=[];
+    tt=t*(10^(-14));
+    dx1= sum((A1(P)'*ones(1,N)).*cos((w1(P)'*ones(1,N)).*tt-(k(P)'*n).*a),1); %First case's position variation 
+    dx2= sum((A2(P)'*ones(1,N)).*cos((w2(P)'*ones(1,N)).*tt-(k(P)'*n).*a),1); %Second case's position variation 
+    dxwave1= sum((A1(P)'*ones(1,Nfine)).*cos((w1(P)'*ones(1,Nfine)).*tt-(k(P)'*nfine).*a),1); %First case's position variation in fine grid
+    dxwave2= sum((A2(P)'*ones(1,Nfine)).*cos((w2(P)'*ones(1,Nfine)).*tt-(k(P)'*nfine).*a),1); %Second case's position variation in fine grid
+    xsol1=x+dx1; %First case's position
+    xsol2=x+dx2; %Second case's position
+    y=zeros(length(xsol1),1);
+    
+    if N > 6
+        if ii == 1
+            e=(N+1)/2;
+        else
+            e=N/2;
+        end
+        
+        plot(x(e-2:e+2),y(e-2:e+2),'o','Color',[0 0 0],'MarkerSize',1,'LineWidth',1); %Equilibrium position
+        hold on
+        axis([x(e-3) x(e+3) -0.4*10^(-9) 0.4*10^(-9)]);
+        plot(xsol1(e-2:e+2),y(e-2:e+2),'o','Color',[0 0 1],'MarkerSize',10,'LineWidth',1); %First case's atoms
+        plot(xsol2(e-2:e+2),y(e-2:e+2),'o','Color',[1 0 0],'MarkerSize',10,'LineWidth',1); %Second case's Atoms
+        hold on
+        plot(xfine,dxwave1,'b') %First case's wave
+        plot(xfine,dxwave2,'r') %Second case's wave
+        
+    else %case 2
+        plot(x,y,'o','Color',[0 0 0],'MarkerSize',1,'LineWidth',2);
+        hold on
+        axis([0 x(N)+a -0.4*10^(-9) 0.4*10^(-9)]);
+        plot(xsol1,y,'o','Color',[0 0 1],'MarkerSize',10,'LineWidth',1);
+        plot(xsol2,y,'o','Color',[1 0 0],'MarkerSize',10,'LineWidth',1);
+        hold on
+        plot(xfine,dxwave1,'b')
+        plot(xfine,dxwave2,'r')
+    end
+    frame= getframe(1);
+    im{t} = frame2im(frame);
+    hold off
+    
+end
+
+filename = 'Monoatomic_chain_comparation.gif';
+
+for i = timestart:timelapse
+    [Ag,map] = rgb2ind(im{i},256);
+    if i == timestart
+        imwrite(Ag,map,filename,'gif','LoopCount',Inf,'DelayTime',.1);
+    else
+        imwrite(Ag,map,filename,'gif','WriteMode','append','DelayTime',.1);
+    end
+end
+
+
+
+##### SOURCE END #####
+--></body></html>
